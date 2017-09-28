@@ -1,0 +1,17 @@
+{
+  "name": "predictor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "bluebird": "^3.5.0",
+    "cfb-data": "^2.2.1",
+    "csvjson": "^4.3.4",
+    "synaptic": "^1.1.2"
+  }
+}

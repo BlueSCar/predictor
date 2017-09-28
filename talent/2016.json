@@ -1,0 +1,712 @@
+[{
+    "name": "Alabama",
+    "talent": 982.66
+}, {
+    "name": "USC",
+    "talent": 936.86
+}, {
+    "name": "LSU",
+    "talent": 917.72
+}, {
+    "name": "Florida State",
+    "talent": 906.64
+}, {
+    "name": "Ohio State",
+    "talent": 902.46
+}, {
+    "name": "Georgia",
+    "talent": 872
+}, {
+    "name": "Auburn",
+    "talent": 865.36
+}, {
+    "name": "Michigan",
+    "talent": 852.78
+}, {
+    "name": "Clemson",
+    "talent": 846
+}, {
+    "name": "Notre Dame",
+    "talent": 842.35
+}, {
+    "name": "Texas",
+    "talent": 838.97
+}, {
+    "name": "UCLA",
+    "talent": 819.16
+}, {
+    "name": "Texas A&M",
+    "talent": 814.63
+}, {
+    "name": "Tennessee",
+    "talent": 813.92
+}, {
+    "name": "Ole Miss",
+    "talent": 808.15
+}, {
+    "name": "Florida",
+    "talent": 798.44
+}, {
+    "name": "Stanford",
+    "talent": 778.45
+}, {
+    "name": "Oklahoma",
+    "talent": 777.48
+}, {
+    "name": "Miami",
+    "talent": 745.93
+}, {
+    "name": "Penn State",
+    "talent": 742.52
+}, {
+    "name": "Oregon",
+    "talent": 738.29
+}, {
+    "name": "Michigan State",
+    "talent": 719.7
+}, {
+    "name": "South Carolina",
+    "talent": 706.9
+}, {
+    "name": "Washington",
+    "talent": 699.64
+}, {
+    "name": "Arizona State",
+    "talent": 694.21
+}, {
+    "name": "Nebraska",
+    "talent": 691.61
+}, {
+    "name": "Arkansas",
+    "talent": 689.41
+}, {
+    "name": "Mississippi State",
+    "talent": 679.14
+}, {
+    "name": "North Carolina",
+    "talent": 669.61
+}, {
+    "name": "TCU",
+    "talent": 665.53
+}, {
+    "name": "West Virginia",
+    "talent": 654.64
+}, {
+    "name": "Louisville",
+    "talent": 654.13
+}, {
+    "name": "Kentucky",
+    "talent": 652.07
+}, {
+    "name": "Maryland",
+    "talent": 651.99
+}, {
+    "name": "Pittsburgh",
+    "talent": 649.85
+}, {
+    "name": "Virginia Tech",
+    "talent": 646.82
+}, {
+    "name": "Wisconsin",
+    "talent": 643.76
+}, {
+    "name": "Missouri",
+    "talent": 633.76
+}, {
+    "name": "Oklahoma State",
+    "talent": 631.68
+}, {
+    "name": "Baylor",
+    "talent": 619.18
+}, {
+    "name": "Vanderbilt",
+    "talent": 619.03
+}, {
+    "name": "Virginia",
+    "talent": 618.91
+}, {
+    "name": "Arizona",
+    "talent": 616.31
+}, {
+    "name": "NC State",
+    "talent": 616.29
+}, {
+    "name": "Northwestern",
+    "talent": 613.55
+}, {
+    "name": "Texas Tech",
+    "talent": 604.93
+}, {
+    "name": "California",
+    "talent": 601.17
+}, {
+    "name": "Duke",
+    "talent": 599.82
+}, {
+    "name": "Rutgers",
+    "talent": 585.47
+}, {
+    "name": "Georgia Tech",
+    "talent": 582.55
+}, {
+    "name": "Utah",
+    "talent": 580.07
+}, {
+    "name": "Houston",
+    "talent": 572.7
+}, {
+    "name": "Indiana",
+    "talent": 565.47
+}, {
+    "name": "USF",
+    "talent": 563.99
+}, {
+    "name": "Iowa",
+    "talent": 558.73
+}, {
+    "name": "Iowa State",
+    "talent": 552.17
+}, {
+    "name": "Boise State",
+    "talent": 548.82
+}, {
+    "name": "Cincinnati",
+    "talent": 541.58
+}, {
+    "name": "Minnesota",
+    "talent": 535.44
+}, {
+    "name": "Boston College",
+    "talent": 533.39
+}, {
+    "name": "BYU",
+    "talent": 529.05
+}, {
+    "name": "Colorado",
+    "talent": 526.39
+}, {
+    "name": "Oregon State",
+    "talent": 524.89
+}, {
+    "name": "Illinois",
+    "talent": 523.91
+}, {
+    "name": "Washington State",
+    "talent": 522.58
+}, {
+    "name": "Syracuse",
+    "talent": 520.26
+}, {
+    "name": "Wake Forest",
+    "talent": 517.63
+}, {
+    "name": "Purdue",
+    "talent": 512.72
+}, {
+    "name": "UCF",
+    "talent": 510.27
+}, {
+    "name": "Kansas State",
+    "talent": 505.29
+}, {
+    "name": "Temple",
+    "talent": 492.72
+}, {
+    "name": "Kansas",
+    "talent": 491
+}, {
+    "name": "Marshall",
+    "talent": 485.46
+}, {
+    "name": "San Diego State",
+    "talent": 482.31
+}, {
+    "name": "SMU",
+    "talent": 474.03
+}, {
+    "name": "Arkansas State",
+    "talent": 471.45
+}, {
+    "name": "Toledo",
+    "talent": 460.86
+}, {
+    "name": "Louisiana Tech",
+    "talent": 451.38
+}, {
+    "name": "Memphis",
+    "talent": 451.24
+}, {
+    "name": "Akron",
+    "talent": 443.73
+}, {
+    "name": "Western Michigan",
+    "talent": 443.16
+}, {
+    "name": "East Carolina",
+    "talent": 442.26
+}, {
+    "name": "Southern Mississippi",
+    "talent": 441.29
+}, {
+    "name": "San Jose State",
+    "talent": 437.36
+}, {
+    "name": "Middle Tennessee",
+    "talent": 436.6
+}, {
+    "name": "Georgia Southern",
+    "talent": 435.33
+}, {
+    "name": "Connecticut",
+    "talent": 423.56
+}, {
+    "name": "Louisiana-Lafayette",
+    "talent": 421.37
+}, {
+    "name": "Miami (OH)",
+    "talent": 418.04
+}, {
+    "name": "Colorado State",
+    "talent": 412.28
+}, {
+    "name": "Tulsa",
+    "talent": 409.17
+}, {
+    "name": "Florida Atlantic",
+    "talent": 408.4
+}, {
+    "name": "Fresno State",
+    "talent": 404.97
+}, {
+    "name": "Northern Illinois",
+    "talent": 403.27
+}, {
+    "name": "Western Kentucky",
+    "talent": 401.82
+}, {
+    "name": "UT San Antonio",
+    "talent": 397.64
+}, {
+    "name": "Rice",
+    "talent": 394.83
+}, {
+    "name": "Bowling Green",
+    "talent": 392.66
+}, {
+    "name": "Central Michigan",
+    "talent": 391.81
+}, {
+    "name": "Troy",
+    "talent": 390.47
+}, {
+    "name": "Nevada",
+    "talent": 389.56
+}, {
+    "name": "South Alabama",
+    "talent": 389.36
+}, {
+    "name": "Tulane",
+    "talent": 388.04
+}, {
+    "name": "New Mexico",
+    "talent": 387.26
+}, {
+    "name": "Hawai'i",
+    "talent": 384.97
+}, {
+    "name": "UNLV",
+    "talent": 376.26
+}, {
+    "name": "Ohio",
+    "talent": 372.56
+}, {
+    "name": "Massachusetts",
+    "talent": 370.9
+}, {
+    "name": "Ball State",
+    "talent": 365.94
+}, {
+    "name": "FIU",
+    "talent": 362.84
+}, {
+    "name": "Utah State",
+    "talent": 357.13
+}, {
+    "name": "Texas State",
+    "talent": 351.76
+}, {
+    "name": "North Texas",
+    "talent": 351.58
+}, {
+    "name": "Eastern Michigan",
+    "talent": 347.7
+}, {
+    "name": "Old Dominion",
+    "talent": 347.2
+}, {
+    "name": "Buffalo",
+    "talent": 343.64
+}, {
+    "name": "Navy",
+    "talent": 342.77
+}, {
+    "name": "Kent State",
+    "talent": 334.01
+}, {
+    "name": "Appalachian State",
+    "talent": 333.36
+}, {
+    "name": "Charlotte",
+    "talent": 330.55
+}, {
+    "name": "Louisiana-Monroe",
+    "talent": 322.82
+}, {
+    "name": "Georgia State",
+    "talent": 321.79
+}, {
+    "name": "Wyoming",
+    "talent": 316.18
+}, {
+    "name": "UTEP",
+    "talent": 290.4
+}, {
+    "name": "New Mexico State",
+    "talent": 267.66
+}, {
+    "name": "Idaho",
+    "talent": 256.78
+}, {
+    "name": "Jacksonville State",
+    "talent": 254.26
+}, {
+    "name": "Eastern Kentucky",
+    "talent": 184.88
+}, {
+    "name": "Yale",
+    "talent": 165.17
+}, {
+    "name": "Northern Iowa",
+    "talent": 164.16
+}, {
+    "name": "Portland State",
+    "talent": 154.68
+}, {
+    "name": "Army",
+    "talent": 131.74
+}, {
+    "name": "Youngstown State",
+    "talent": 130.84
+}, {
+    "name": "James Madison",
+    "talent": 128.58
+}, {
+    "name": "Southern Illinois",
+    "talent": 123.69
+}, {
+    "name": "Southeastern Louisiana",
+    "talent": 121.61
+}, {
+    "name": "Chattanooga",
+    "talent": 119.2
+}, {
+    "name": "Eastern Illinois",
+    "talent": 119.04
+}, {
+    "name": "Wagner",
+    "talent": 118.43
+}, {
+    "name": "Stony Brook",
+    "talent": 118.15
+}, {
+    "name": "Duquesne",
+    "talent": 116.15
+}, {
+    "name": "Tennessee-Martin",
+    "talent": 107.98
+}, {
+    "name": "Northern Arizona",
+    "talent": 104.38
+}, {
+    "name": "Illinois State",
+    "talent": 102.21
+}, {
+    "name": "Hampton",
+    "talent": 99.46
+}, {
+    "name": "Towson",
+    "talent": 95.18
+}, {
+    "name": "Samford",
+    "talent": 94.57
+}, {
+    "name": "Grambling",
+    "talent": 93.31
+}, {
+    "name": "Cal Poly",
+    "talent": 91.73
+}, {
+    "name": "Nicholls State",
+    "talent": 89.59
+}, {
+    "name": "Jackson State",
+    "talent": 86.85
+}, {
+    "name": "Montana",
+    "talent": 83.1
+}, {
+    "name": "North Dakota State",
+    "talent": 81.65
+}, {
+    "name": "Stephen F. Austin",
+    "talent": 80.33
+}, {
+    "name": "Western Illinois",
+    "talent": 78.62
+}, {
+    "name": "Southeast Missouri State",
+    "talent": 76.33
+}, {
+    "name": "South Carolina State",
+    "talent": 75.71
+}, {
+    "name": "Coastal Carolina",
+    "talent": 71.67
+}, {
+    "name": "McNeese State",
+    "talent": 69.85
+}, {
+    "name": "Southern Utah",
+    "talent": 68.79
+}, {
+    "name": "Prairie View A&M",
+    "talent": 67.68
+}, {
+    "name": "Norfolk State",
+    "talent": 67.07
+}, {
+    "name": "Furman",
+    "talent": 66.86
+}, {
+    "name": "Charleston Southern",
+    "talent": 65.6
+}, {
+    "name": "Montana State",
+    "talent": 64.33
+}, {
+    "name": "Bethune-Cookman",
+    "talent": 63.39
+}, {
+    "name": "Murray State",
+    "talent": 62.79
+}, {
+    "name": "Central Arkansas",
+    "talent": 62.11
+}, {
+    "name": "Houston Baptist",
+    "talent": 61.17
+}, {
+    "name": "Pennsylvania",
+    "talent": 60.95
+}, {
+    "name": "Mercer",
+    "talent": 57.71
+}, {
+    "name": "Kennesaw State",
+    "talent": 54.76
+}, {
+    "name": "Weber State",
+    "talent": 54.68
+}, {
+    "name": "Alabama State",
+    "talent": 53.46
+}, {
+    "name": "Tennessee Tech",
+    "talent": 53
+}, {
+    "name": "Richmond",
+    "talent": 51.95
+}, {
+    "name": "Tennessee State",
+    "talent": 51.82
+}, {
+    "name": "Southern University",
+    "talent": 46.97
+}, {
+    "name": "Sacramento State",
+    "talent": 45.18
+}, {
+    "name": "Eastern Washington",
+    "talent": 45.1
+}, {
+    "name": "Austin Peay",
+    "talent": 44.67
+}, {
+    "name": "Air Force",
+    "talent": 44.58
+}, {
+    "name": "Texas Southern",
+    "talent": 43.86
+}, {
+    "name": "Lamar",
+    "talent": 43.84
+}, {
+    "name": "Indiana State",
+    "talent": 43.84
+}, {
+    "name": "William & Mary",
+    "talent": 43.54
+}, {
+    "name": "Presbyterian",
+    "talent": 41.4
+}, {
+    "name": "Rhode Island",
+    "talent": 41.24
+}, {
+    "name": "Campbell",
+    "talent": 40.68
+}, {
+    "name": "Alcorn State",
+    "talent": 39.3
+}, {
+    "name": "Citadel",
+    "talent": 37.64
+}, {
+    "name": "Fordham",
+    "talent": 36.98
+}, {
+    "name": "Princeton",
+    "talent": 36.73
+}, {
+    "name": "Monmouth",
+    "talent": 35.77
+}, {
+    "name": "South Dakota",
+    "talent": 32.89
+}, {
+    "name": "Northwestern State",
+    "talent": 32.06
+}, {
+    "name": "Virginia Military",
+    "talent": 31.43
+}, {
+    "name": "East Tennessee State",
+    "talent": 31.35
+}, {
+    "name": "Valparaiso",
+    "talent": 29.84
+}, {
+    "name": "Northern Colorado",
+    "talent": 29.66
+}, {
+    "name": "Drake",
+    "talent": 27.37
+}, {
+    "name": "Robert Morris",
+    "talent": 26.7
+}, {
+    "name": "Alabama A&M",
+    "talent": 26.31
+}, {
+    "name": "Idaho State",
+    "talent": 25.18
+}, {
+    "name": "Villanova",
+    "talent": 23.98
+}, {
+    "name": "Savannah State",
+    "talent": 23.51
+}, {
+    "name": "Maine",
+    "talent": 23.37
+}, {
+    "name": "Delaware State",
+    "talent": 22.84
+}, {
+    "name": "Gardner-Webb",
+    "talent": 22.66
+}, {
+    "name": "Butler",
+    "talent": 21.56
+}, {
+    "name": "Columbia",
+    "talent": 21.24
+}, {
+    "name": "Liberty",
+    "talent": 21.04
+}, {
+    "name": "Abilene Christian",
+    "talent": 19.77
+}, {
+    "name": "Wofford",
+    "talent": 19.48
+}, {
+    "name": "Sacred Heart",
+    "talent": 19.44
+}, {
+    "name": "Harvard",
+    "talent": 17.28
+}, {
+    "name": "Brown",
+    "talent": 16.92
+}, {
+    "name": "Florida A&M",
+    "talent": 16.64
+}, {
+    "name": "Cornell",
+    "talent": 15.89
+}, {
+    "name": "Dayton",
+    "talent": 14.99
+}, {
+    "name": "Holy Cross",
+    "talent": 14.75
+}, {
+    "name": "Western Carolina",
+    "talent": 13.67
+}, {
+    "name": "Jacksonville",
+    "talent": 13.41
+}, {
+    "name": "North Carolina Central",
+    "talent": 13.15
+}, {
+    "name": "Missouri State",
+    "talent": 12.7
+}, {
+    "name": "Georgetown",
+    "talent": 12.6
+}, {
+    "name": "New Hampshire",
+    "talent": 11.21
+}, {
+    "name": "Stetson",
+    "talent": 9.99
+}, {
+    "name": "Howard",
+    "talent": 7.53
+}, {
+    "name": "Lehigh",
+    "talent": 6.66
+}, {
+    "name": "Arkansas-Pine Bluff",
+    "talent": 6.66
+}, {
+    "name": "Morehead State",
+    "talent": 6.66
+}, {
+    "name": "Central Connecticut",
+    "talent": 6.66
+}, {
+    "name": "San Diego",
+    "talent": 6.66
+}, {
+    "name": "Bryant",
+    "talent": 6.24
+}, {
+    "name": "North Carolina A&T",
+    "talent": 3.81
+}, {
+    "name": "St Francis (PA)",
+    "talent": 1.74
+}]
