@@ -34,13 +34,13 @@ module.exports = (fs, csvjson) => {
                 continue;
             }
 
-            let dRushing = rushingDefense.find(t => t.Team == oRushing.Team);
-            let oScoring = scoringOffense.find(t => t.Team == oRushing.Team);
-            let dScoring = scoringDefense.find(t => t.Team == oRushing.Team);
-            let oTotal = totalOffense.find(t => t.Team == oRushing.Team);
-            let dTotal = totalDefense.find(t => t.Team == oRushing.Team);
-            let oPassing = passingOffense.find(t => t.Team == oRushing.Team);
-            let dPassing = passingDefense.find(t => t.Team == oRushing.Team);
+            let dRushing = rushingDefense.find(t => t.Team == mapMatch.location || t.Team == mapMatch.ncaaName || t.Team == mapMatch.abbreviation || t.Team == mapMatch.altName);
+            let oScoring = scoringOffense.find(t => t.Team == mapMatch.location || t.Team == mapMatch.ncaaName || t.Team == mapMatch.abbreviation || t.Team == mapMatch.altName);
+            let dScoring = scoringDefense.find(t => t.Team == mapMatch.location || t.Team == mapMatch.ncaaName || t.Team == mapMatch.abbreviation || t.Team == mapMatch.altName);
+            let oTotal = totalOffense.find(t => t.Team == mapMatch.location || t.Team == mapMatch.ncaaName || t.Team == mapMatch.abbreviation || t.Team == mapMatch.altName);
+            let dTotal = totalDefense.find(t => t.Team == mapMatch.location || t.Team == mapMatch.ncaaName || t.Team == mapMatch.abbreviation || t.Team == mapMatch.altName);
+            let oPassing = passingOffense.find(t => t.Team == mapMatch.location || t.Team == mapMatch.ncaaName || t.Team == mapMatch.abbreviation || t.Team == mapMatch.altName);
+            let dPassing = passingDefense.find(t => t.Team == mapMatch.location || t.Team == mapMatch.ncaaName || t.Team == mapMatch.abbreviation || t.Team == mapMatch.altName);
             let teamTalent = talent.find(t => {
                 return t.name == mapMatch.location || t.name == mapMatch.ncaaName || t.name == mapMatch.abbreviation || t.name == mapMatch.altName;
             });
@@ -69,33 +69,61 @@ module.exports = (fs, csvjson) => {
 
     let processSOS = (stats, events) => {
         for (let stat of stats) {
+            stat.record = {};
+            stat.conferenceRecord = {};
+
             let teamEvents = events.filter((event) => {
                 let game = event.competitions[0];
                 let team = game.competitors.find(t => {
                     return t.id == stat.id;
                 })
-    
+
                 return team && game.status.type.completed;
             });
-    
+
             let talent = 0;
-    
+
             for (let event of teamEvents) {
                 let otherTeam = event.competitions[0].competitors.find(t => {
                     return t.id != stat.id;
                 });
-    
+
                 let otherTeamStats = stats.find(t => {
                     return t.id == otherTeam.id;
                 });
-    
+
                 if (!otherTeamStats) {
                     continue;
                 }
-    
+
                 talent += otherTeamStats.talent;
             }
-    
+
+            let orderedEvents = teamEvents.sort((a,b) => {
+                return new Date(a.date) < new Date(b.date) ? 1 : 0;
+            });
+
+            let last = orderedEvents[0].competitions[0];
+            let teamRecords = last.competitors.find(t => {
+                return t.id == stat.id;
+            }).records;
+
+            let totalRecord = teamRecords.find(r => {
+                return r.type == "total";
+            });
+
+            stat.record.wins = totalRecord.summary.split("-")[0] * 1.0;
+            stat.record.losses = totalRecord.summary.split("-")[1] * 1.0;
+
+            let conferenceRecord = teamRecords.find(r => {
+                return r.type == "vsconf";
+            });
+            
+            if (conferenceRecord && conferenceRecord.summary){
+                stat.conferenceRecord.wins = conferenceRecord.summary.split("-")[0] * 1.0;
+                stat.conferenceRecord.losses = conferenceRecord.summary.split("-")[1] * 1.0;
+            }
+
             stat.SOS = talent / teamEvents.length;
         }
     }

@@ -30,8 +30,8 @@ predictorService.initialize()
         // let result = predictorService.projectGame({
         //     id: 130
         // }, {
-        //     id: 127
-        // }, 0, 1);
+        //     id: 87
+        // }, 1, 1);
         // result;
 
         predictorService.updatePredictions();

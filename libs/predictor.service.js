@@ -1,5 +1,6 @@
 module.exports = (fs, statsService, myNetwork, cfb) => {
-    let csvPath = 'C:\\Users\\bradjewski\\Desktop\\data\\predictions\\Week 4.csv';
+    let csvPath = 'C:\\Users\\bradjewski\\Desktop\\data\\predictions\\Week 5.csv';
+    let recordsPath = 'C:\\Users\\bradjewski\\Desktop\\data\\predictions\\Week 5 Records.csv';
     let stats = statsService.getStatsForYear(2017);
 
     let lastYearStats = statsService.getStatsForYear(2016);
@@ -126,7 +127,7 @@ module.exports = (fs, statsService, myNetwork, cfb) => {
         sorted.pop();
         sorted.pop();
 
-        for (let stat of stats){
+        for (let stat of stats) {
             stat.playoffHistory = "";
         }
 
@@ -134,17 +135,17 @@ module.exports = (fs, statsService, myNetwork, cfb) => {
 
         simulateRound(sorted, results, 1);
 
-        for (let stat of stats){
+        for (let stat of stats) {
             fs.appendFile("C:\\Users\\bradjewski\\Desktop\\data\\ranks\\rankings.csv", `\r\n${stat.playoffHistory},${stat.location}`);
         }
 
-        for (let result of results){
+        for (let result of results) {
             fs.appendFile("C:\\Users\\bradjewski\\Desktop\\data\\ranks\\results.csv", `\r\n${result.round},${result.homeId},${result.homeLocation},${result.homeScore},${result.awayId},${result.awayLocation},${result.awayScore}`);
         }
     }
 
     let simulateRound = (teams, results, round) => {
-        if (teams.length == 1){
+        if (teams.length == 1) {
             return;
         }
 
@@ -159,8 +160,12 @@ module.exports = (fs, statsService, myNetwork, cfb) => {
             let topTeam = topTier[i];
             let bottomTeam = teams[numGames - (i + 1)];
 
-            topStat = stats.find(t => {return t.id == topTeam.id;});
-            bottomStat = stats.find(t => {return t.id == bottomTeam.id;});
+            topStat = stats.find(t => {
+                return t.id == topTeam.id;
+            });
+            bottomStat = stats.find(t => {
+                return t.id == bottomTeam.id;
+            });
 
             let result = projectGame({
                 id: topTeam.id
@@ -168,7 +173,7 @@ module.exports = (fs, statsService, myNetwork, cfb) => {
                 id: bottomTeam.id
             }, 0, 1);
 
-            if (result.homeProjection > result.awayProjection){
+            if (result.homeProjection > result.awayProjection) {
                 topStat.playoffHistory += "1";
                 bottomStat.playoffHistory += "0";
                 winners.push(topTeam);
@@ -267,8 +272,46 @@ module.exports = (fs, statsService, myNetwork, cfb) => {
     let writeGamePrediction = (event) => {
         let result = getGamePrediction(event);
 
-        if (!result){
+        if (!result) {
             return;
+        }
+
+        if (!event.competitions[0].status.type.completed) {
+            let margin = result.homeProjection - result.awayProjection;
+            let game = event.competitions[0];
+
+            let homeTeam = game.competitors.find(t => {
+                return t.homeAway == 'home';
+            });
+            let awayTeam = game.competitors.find(t => {
+                return t.homeAway == 'away';
+            });
+
+            let homeStats = stats.find(t => {
+                return t.id == homeTeam.id;
+            });
+
+            let awayStats = stats.find(t => {
+                return t.id == awayTeam.id;
+            });
+
+            if (margin > 0) {
+                homeStats.record.wins++;
+                awayStats.record.losses++;
+
+                if (game.conferenceCompetition) {
+                    homeStats.conferenceRecord.wins++;
+                    awayStats.conferenceRecord.losses++
+                }
+            } else {
+                homeStats.record.losses++;
+                awayStats.record.wins++;
+
+                if (game.conferenceCompetition) {
+                    homeStats.conferenceRecord.losses++;
+                    awayStats.conferenceRecord.wins++
+                }
+            }
         }
 
         fs.appendFile(csvPath, `\r\n${result.id},${result.date},${result.homeTeam.team.location},${Math.round(result.homeProjection * 1000)/10},${result.homeTeam.score},${result.awayTeam.team.location},${Math.round(result.awayProjection * 1000)/10},${result.awayTeam.score}`);
@@ -282,6 +325,10 @@ module.exports = (fs, statsService, myNetwork, cfb) => {
 
             for (let event of data.events) {
                 writeGamePrediction(event);
+            }
+
+            for (let stat of stats){
+                fs.appendFile(recordsPath, `\r\n${stat.id},${stat.location},${stat.record.wins},${stat.record.losses},${stat.conferenceRecord == null ? 0 : stat.conferenceRecord.wins},${stat.conferenceRecord == null ? 0 : stat.conferenceRecord.losses}`);
             }
         });
     }
