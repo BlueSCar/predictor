@@ -9,7 +9,6 @@ module.exports = (fs) => {
     let miniBatchTrain = (iterations, trainer, trainingSet, MiniBatchSize, options) => {
         var i = 0;
         while (i < iterations) {
-            console.log(`Iteration ${i + 1}`);
             var workingTrainingSet = trainingSet.slice(0);
             shuffle(workingTrainingSet);
 
@@ -86,9 +85,75 @@ module.exports = (fs) => {
         console.log(result.error);
     }
 
+    let trainProbNetwork = () => {
+        let myNetwork = new Architect.Perceptron(22, 5, 1);
+        let trainer = new Trainer(myNetwork);
+        let trainingSet = require('../dataset').map((value) => {
+            return {
+                input: value.input,
+                output: [value.output[0] > value.output[1] ? 1 : 0]
+            }
+        });
+        let testSet = require('../testData').map((value) => {
+            return {
+                input: value.input,
+                output: [value.output[0] > value.output[1] ? 1 : 0]
+            }
+        });
+
+        // miniBatchTrain(20, trainer, trainingSet, 300, {
+
+        let error = 1;
+
+        for (var i = 1; i < 50000; i++) {
+            trainer.train(trainingSet, {
+                rate: .1,
+                iterations: 10,
+                error: 0.005,
+                shuffle: true
+            });
+
+            let testResult = trainer.test(testSet);
+
+            if (testResult.error < error) {
+                error = testResult.error;
+                console.log(`New record at iteration ${i*10}: ${error}`);
+
+                fs.writeFileSync('./myProbNetworkOptimized.json', JSON.stringify(myNetwork.toJSON(), null, '\t'));
+            }
+        }
+
+        fs.writeFileSync('./myProbNetwork.json', JSON.stringify(myNetwork.toJSON(), null, '\t'));
+    }
+
+    let retrieveProbNetwork = () => {
+        let network = require('../myProbNetwork');
+        let myNetwork = Architect.Perceptron.fromJSON(network);
+
+        return myNetwork;
+    }
+
+    let testProbNetwork = () => {
+        let network = retrieveProbNetwork();
+        let testSet = require('../testData').map((value) => {
+            return {
+                input: value.input,
+                output: value.output[0] > value.output[1] ? 1 : 0
+            }
+        });
+        let trainer = new Trainer(network);
+
+        let result = trainer.test(testSet);
+
+        console.log(result.error);
+    }
+
     return {
         trainNetwork: trainNetwork,
         retrieveNetwork: retrieveNetwork,
-        testNetwork: testNetwork
+        testNetwork: testNetwork,
+        trainProbNetwork: trainProbNetwork,
+        retrieveProbNetwork: retrieveProbNetwork,
+        testProbNetwork: testProbNetwork,
     }
 }

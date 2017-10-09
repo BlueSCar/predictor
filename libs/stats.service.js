@@ -114,6 +114,8 @@ module.exports = (fs, csvjson) => {
 
             stat.record.wins = totalRecord.summary.split("-")[0] * 1.0;
             stat.record.losses = totalRecord.summary.split("-")[1] * 1.0;
+            stat.record.winsProb = totalRecord.summary.split("-")[0] * 1.0;
+            stat.record.lossesProb = totalRecord.summary.split("-")[1] * 1.0;
 
             let conferenceRecord = teamRecords.find(r => {
                 return r.type == "vsconf";
@@ -122,6 +124,8 @@ module.exports = (fs, csvjson) => {
             if (conferenceRecord && conferenceRecord.summary){
                 stat.conferenceRecord.wins = conferenceRecord.summary.split("-")[0] * 1.0;
                 stat.conferenceRecord.losses = conferenceRecord.summary.split("-")[1] * 1.0;
+                stat.conferenceRecord.winsProb = conferenceRecord.summary.split("-")[0] * 1.0;
+                stat.conferenceRecord.lossesProb = conferenceRecord.summary.split("-")[1] * 1.0;
             }
 
             stat.SOS = talent / teamEvents.length;

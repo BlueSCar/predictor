@@ -2,3 +2,4 @@ node_modules/
 networks/
 datasets/
 .vscode/
+.eslintrc.json

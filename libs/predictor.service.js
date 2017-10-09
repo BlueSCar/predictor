@@ -1,6 +1,12 @@
-module.exports = (fs, statsService, myNetwork, cfb) => {
-    let csvPath = 'C:\\Users\\bradjewski\\Desktop\\data\\predictions\\Week 5.csv';
-    let recordsPath = 'C:\\Users\\bradjewski\\Desktop\\data\\predictions\\Week 5 Records.csv';
+module.exports = (fs, statsService, networkService, cfb) => {
+    let csvPath = 'C:\\Users\\bradjewski\\Desktop\\data\\predictions\\Week 6.csv';
+    let recordsPath = 'C:\\Users\\bradjewski\\Desktop\\data\\predictions\\Week 6 Records.csv';
+    let probabilitesPath = 'C:\\Users\\bradjewski\\Desktop\\data\\predictions\\Week 6 Probabilities.csv';
+    let recordsProbPath = 'C:\\Users\\bradjewski\\Desktop\\data\\predictions\\Week 6 Record Probabilities.csv';
+
+    let myNetwork = networkService.retrieveNetwork();
+    let probNetwork = networkService.retrieveProbNetwork();
+
     let stats = statsService.getStatsForYear(2017);
 
     let lastYearStats = statsService.getStatsForYear(2016);
@@ -22,7 +28,7 @@ module.exports = (fs, statsService, myNetwork, cfb) => {
     let currentWeight = 1;
     let oldWeight = 0;
 
-    let projectGame = (homeTeam, awayTeam, neutralSite = 1, conferenceCompetition = 0) => {
+    let projectGame = (network, homeTeam, awayTeam, neutralSite = 1, conferenceCompetition = 0) => {
         let homeStats = stats.find(t => {
             return t.id == homeTeam.id;
         });
@@ -68,13 +74,12 @@ module.exports = (fs, statsService, myNetwork, cfb) => {
             awayStats.oYdsAtt
         ];
 
-        let result = myNetwork.activate(input);
+        let result = network.activate(input);
 
         return {
             homeTeam: homeTeam,
-            homeProjection: result[0],
-            awayTeam: awayTeam,
-            awayProjection: result[1]
+            projection: result,
+            awayTeam: awayTeam
         }
     }
 
@@ -90,7 +95,7 @@ module.exports = (fs, statsService, myNetwork, cfb) => {
             });
 
             for (let other of others) {
-                let result = projectGame({
+                let result = projectGame(myNetwork, {
                     id: team.id
                 }, {
                     id: other.id
@@ -100,11 +105,11 @@ module.exports = (fs, statsService, myNetwork, cfb) => {
                     result;
                 }
 
-                if (result.homeProjection > result.awayProjection) {
+                if (result.projection[0] > result.projection[1]) {
                     wins++;
                 }
 
-                totalMargin += (result.homeProjection - result.awayProjection);
+                totalMargin += (result.projection[0] - result.projection[1]);
             }
 
             ranks.push({
@@ -160,20 +165,20 @@ module.exports = (fs, statsService, myNetwork, cfb) => {
             let topTeam = topTier[i];
             let bottomTeam = teams[numGames - (i + 1)];
 
-            topStat = stats.find(t => {
+            let topStat = stats.find(t => {
                 return t.id == topTeam.id;
             });
-            bottomStat = stats.find(t => {
+            let bottomStat = stats.find(t => {
                 return t.id == bottomTeam.id;
             });
 
-            let result = projectGame({
+            let result = projectGame(myNetwork, {
                 id: topTeam.id
             }, {
                 id: bottomTeam.id
             }, 0, 1);
 
-            if (result.homeProjection > result.awayProjection) {
+            if (result.projection[0] > result.projection[1]) {
                 topStat.playoffHistory += "1";
                 bottomStat.playoffHistory += "0";
                 winners.push(topTeam);
@@ -189,10 +194,10 @@ module.exports = (fs, statsService, myNetwork, cfb) => {
                 round: round,
                 homeId: topTeam.id,
                 homeLocation: topTeam.location,
-                homeScore: result.homeProjection,
+                homeScore: result.projection[0],
                 awayId: bottomTeam.id,
                 awayLocation: bottomTeam.location,
-                awayScore: result.awayProjection
+                awayScore: result.projection[1]
             });
         }
 
@@ -202,7 +207,7 @@ module.exports = (fs, statsService, myNetwork, cfb) => {
         simulateRound(losers, results, newRound);
     }
 
-    let getGamePrediction = (event) => {
+    let getGamePrediction = (network, event) => {
         let game = event.competitions[0];
 
         let homeTeam = game.competitors.find(t => {
@@ -257,27 +262,27 @@ module.exports = (fs, statsService, myNetwork, cfb) => {
             awayStats.oYdsAtt * currentWeight + awayStatsOld.oYdsAtt * oldWeight,
         ];
 
-        let result = myNetwork.activate(input);
+        let result = network.activate(input);
 
         return {
             id: event.id,
             date: game.date,
             homeTeam: homeTeam,
-            homeProjection: result[0],
             awayTeam: awayTeam,
-            awayProjection: result[1]
+            projection: result
         }
     }
 
     let writeGamePrediction = (event) => {
-        let result = getGamePrediction(event);
+        let result = getGamePrediction(myNetwork, event);
+        let probResult = getGamePrediction(probNetwork, event);
 
         if (!result) {
             return;
         }
 
-        if (!event.competitions[0].status.type.completed) {
-            let margin = result.homeProjection - result.awayProjection;
+        if (!event.competitions[0].status.type.completed && event.competitions[0].status.type.id != 5 && event.competitions[0].status.type.id != 6) {
+            let margin = result.projection[0] - result.projection[1];
             let game = event.competitions[0];
 
             let homeTeam = game.competitors.find(t => {
@@ -312,9 +317,62 @@ module.exports = (fs, statsService, myNetwork, cfb) => {
                     awayStats.conferenceRecord.wins++
                 }
             }
+
+            homeStats.record.winsProb += probResult.projection[0];
+            homeStats.record.lossesProb += (1 - probResult.projection[0]);
+            awayStats.record.winsProb += (1 - probResult.projection[0]);
+            awayStats.record.lossesProb += probResult.projection[0];
+
+            if (game.conferenceCompetition) {
+                homeStats.conferenceRecord.winsProb += probResult.projection[0];
+                homeStats.conferenceRecord.lossesProb += (1 - probResult.projection[0]);
+                awayStats.conferenceRecord.winsProb += (1 - probResult.projection[0]);
+                awayStats.conferenceRecord.lossesProb += probResult.projection[0];
+            }
         }
 
-        fs.appendFile(csvPath, `\r\n${result.id},${result.date},${result.homeTeam.team.location},${Math.round(result.homeProjection * 1000)/10},${result.homeTeam.score},${result.awayTeam.team.location},${Math.round(result.awayProjection * 1000)/10},${result.awayTeam.score}`);
+        fs.appendFile(csvPath, `\r\n${result.id},${result.date},${result.homeTeam.team.location},${Math.round(result.projection[0] * 1000)/10},${result.homeTeam.score},${result.awayTeam.team.location},${Math.round(result.projection[1] * 1000)/10},${result.awayTeam.score},${probResult.projection[0]}`);
+    }
+
+    let writeGamePredictionProb = (event) => {
+        let result = getGamePrediction(probNetwork, event);
+
+        if (!result) {
+            return;
+        }
+
+        if (!event.competitions[0].status.type.completed && event.competitions[0].status.type.id != 5 && event.competitions[0].status.type.id != 6) {
+            let game = event.competitions[0];
+
+            let homeTeam = game.competitors.find(t => {
+                return t.homeAway == 'home';
+            });
+            let awayTeam = game.competitors.find(t => {
+                return t.homeAway == 'away';
+            });
+
+            let homeStats = stats.find(t => {
+                return t.id == homeTeam.id;
+            });
+
+            let awayStats = stats.find(t => {
+                return t.id == awayTeam.id;
+            });
+
+            homeStats.record.winsProb += result.projection[0];
+            homeStats.record.lossesProb += (1 - result.projection[0]);
+            awayStats.record.winsProb += (1 - result.projection[0]);
+            awayStats.record.lossesProb += result.projection[0];
+
+            if (game.conferenceCompetition) {
+                homeStats.conferenceRecord.winsProb += result.projection[0];
+                homeStats.conferenceRecord.lossesProb += (1 - result.projection[0]);
+                awayStats.conferenceRecord.winsProb += (1 - result.projection[0]);
+                awayStats.conferenceRecord.lossesProb += result.projection[0];
+            }
+        }
+
+        // fs.appendFile(probabilitesPath, `\r\n${result.id},${result.date},${result.homeTeam.team.location},${result.awayTeam.team.location},${result.projection[0]},${result.homeTeam.score > result.awayTeam.score ? 1 : 0},${result.projection[0] > .5 && (result.homeTeam.score > result.awayTeam.score) ? 1 : 0}`);
     }
 
     let updatePredictions = () => {
@@ -327,8 +385,24 @@ module.exports = (fs, statsService, myNetwork, cfb) => {
                 writeGamePrediction(event);
             }
 
-            for (let stat of stats){
-                fs.appendFile(recordsPath, `\r\n${stat.id},${stat.location},${stat.record.wins},${stat.record.losses},${stat.conferenceRecord == null ? 0 : stat.conferenceRecord.wins},${stat.conferenceRecord == null ? 0 : stat.conferenceRecord.losses}`);
+            for (let stat of stats) {
+                fs.appendFile(recordsPath, `\r\n${stat.id},${stat.location},${stat.record.wins},${stat.record.losses},${stat.conferenceRecord == null ? 0 : stat.conferenceRecord.wins},${stat.conferenceRecord == null ? 0 : stat.conferenceRecord.losses},${stat.record.winsProb},${stat.record.lossesProb},${stat.conferenceRecord == null ? 0 : stat.conferenceRecord.winsProb},${stat.conferenceRecord == null ? 0 : stat.conferenceRecord.lossesProb}`);
+            }
+        });
+    }
+
+    let getProbabilities = () => {
+        cfb.scoreboard.getScoreboard({
+            year: 2017
+        }).then((data) => {
+            statsService.processSOS(stats, data.events);
+
+            for (let event of data.events) {
+                writeGamePredictionProb(event);
+            }
+
+            for (let stat of stats) {
+                fs.appendFile(recordsProbPath, `\r\n${stat.id},${stat.location},${stat.record.winsProb},${stat.record.lossesProb},${stat.conferenceRecord == null ? 0 : stat.conferenceRecord.winsProb},${stat.conferenceRecord == null ? 0 : stat.conferenceRecord.lossesProb}`);
             }
         });
     }
@@ -339,6 +413,7 @@ module.exports = (fs, statsService, myNetwork, cfb) => {
         updatePredictions: updatePredictions,
         projectGame: projectGame,
         rankTeams: rankTeams,
-        simulatePlayoff: simulatePlayoff
+        simulatePlayoff: simulatePlayoff,
+        getProbabilities: getProbabilities
     }
 }
