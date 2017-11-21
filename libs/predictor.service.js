@@ -1,8 +1,8 @@
 module.exports = (fs, statsService, networkService, cfb) => {
-    let csvPath = 'C:\\Users\\bradjewski\\Desktop\\data\\predictions\\Week 6.csv';
-    let recordsPath = 'C:\\Users\\bradjewski\\Desktop\\data\\predictions\\Week 6 Records.csv';
-    let probabilitesPath = 'C:\\Users\\bradjewski\\Desktop\\data\\predictions\\Week 6 Probabilities.csv';
-    let recordsProbPath = 'C:\\Users\\bradjewski\\Desktop\\data\\predictions\\Week 6 Record Probabilities.csv';
+    let csvPath = 'C:\\Users\\bradjewski\\Desktop\\data\\predictions\\Week 11.csv';
+    let recordsPath = 'C:\\Users\\bradjewski\\Desktop\\data\\predictions\\Week 11 Records.csv';
+    let probabilitesPath = 'C:\\Users\\bradjewski\\Desktop\\data\\predictions\\Week 7 Probabilities.csv';
+    let recordsProbPath = 'C:\\Users\\bradjewski\\Desktop\\data\\predictions\\Week 7 Record Probabilities.csv';
 
     let myNetwork = networkService.retrieveNetwork();
     let probNetwork = networkService.retrieveProbNetwork();
@@ -61,7 +61,13 @@ module.exports = (fs, statsService, networkService, cfb) => {
             homeStats.oRushP,
             homeStats.oPPP,
             homeStats.oYPP,
-            homeStats.oYdsAtt,
+            homeStats.oYdsAtt,                
+            homeStats.oThirdD,
+            homeStats.dThirdDown,
+            homeStats.giveaways,
+            homeStats.takeaways,
+            homeStats.oRZ,
+            homeStats.dRZ,
             awayStats.talent,
             awayStats.SOS,
             awayStats.dRushP,
@@ -71,7 +77,13 @@ module.exports = (fs, statsService, networkService, cfb) => {
             awayStats.oRushP,
             awayStats.oPPP,
             awayStats.oYPP,
-            awayStats.oYdsAtt
+            awayStats.oYdsAtt,                
+            awayStats.oThirdD,
+            awayStats.dThirdDown,
+            awayStats.giveaways,
+            awayStats.takeaways,
+            awayStats.oRZ,
+            awayStats.dRZ
         ];
 
         let result = network.activate(input);
@@ -242,24 +254,36 @@ module.exports = (fs, statsService, networkService, cfb) => {
             game.conferenceCompetition ? 1 : 0,
             homeStats.talent,
             homeStats.SOS,
-            homeStats.dRushP * currentWeight + homeStatsOld.dRushP * oldWeight,
-            homeStats.dPPP * currentWeight + homeStatsOld.dPPP * oldWeight,
-            homeStats.dYPP * currentWeight + homeStatsOld.dYPP * oldWeight,
-            homeStats.dYdsAtt * currentWeight + homeStatsOld.dYdsAtt * oldWeight,
-            homeStats.oRushP * currentWeight + homeStatsOld.oRushP * oldWeight,
-            homeStats.oPPP * currentWeight + homeStatsOld.oPPP * oldWeight,
-            homeStats.oYPP * currentWeight + homeStatsOld.oYPP * oldWeight,
-            homeStats.oYdsAtt * currentWeight + homeStatsOld.oYdsAtt * oldWeight,
+            homeStats.dRushP,
+            homeStats.dPPP,
+            homeStats.dYPP,
+            homeStats.dYdsAtt,
+            homeStats.oRushP,
+            homeStats.oPPP,
+            homeStats.oYPP,
+            homeStats.oYdsAtt,                
+            homeStats.oThirdD,
+            homeStats.dThirdDown,
+            homeStats.giveaways,
+            homeStats.takeaways,
+            homeStats.oRZ,
+            homeStats.dRZ,
             awayStats.talent,
             awayStats.SOS,
-            awayStats.dRushP * currentWeight + awayStatsOld.dRushP * oldWeight,
-            awayStats.dPPP * currentWeight + awayStatsOld.dPPP * oldWeight,
-            awayStats.dYPP * currentWeight + awayStatsOld.dYPP * oldWeight,
-            awayStats.dYdsAtt * currentWeight + awayStatsOld.dYdsAtt * oldWeight,
-            awayStats.oRushP * currentWeight + awayStatsOld.oRushP * oldWeight,
-            awayStats.oPPP * currentWeight + awayStatsOld.oPPP * oldWeight,
-            awayStats.oYPP * currentWeight + awayStatsOld.oYPP * oldWeight,
-            awayStats.oYdsAtt * currentWeight + awayStatsOld.oYdsAtt * oldWeight,
+            awayStats.dRushP,
+            awayStats.dPPP,
+            awayStats.dYPP,
+            awayStats.dYdsAtt,
+            awayStats.oRushP,
+            awayStats.oPPP,
+            awayStats.oYPP,
+            awayStats.oYdsAtt,                
+            awayStats.oThirdD,
+            awayStats.dThirdDown,
+            awayStats.giveaways,
+            awayStats.takeaways,
+            awayStats.oRZ,
+            awayStats.dRZ
         ];
 
         let result = network.activate(input);
@@ -414,6 +438,7 @@ module.exports = (fs, statsService, networkService, cfb) => {
         projectGame: projectGame,
         rankTeams: rankTeams,
         simulatePlayoff: simulatePlayoff,
-        getProbabilities: getProbabilities
+        getProbabilities: getProbabilities,
+        stats: stats
     }
 }

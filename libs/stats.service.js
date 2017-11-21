@@ -2,7 +2,7 @@ module.exports = (fs, csvjson) => {
     const statsPath = 'C:\\Users\\bradjewski\\Desktop\\data\\stats';
     const mappings = require('../teamMappings');
 
-    let readData = (year, type) => {
+    const readData = (year, type) => {
         let data = fs.readFileSync(`${statsPath}\\${year}\\Team\\${type}.csv`, {
             encoding: 'utf8'
         });
@@ -11,16 +11,22 @@ module.exports = (fs, csvjson) => {
         });
     }
 
-    let getStatsForYear = (year) => {
-        let rushingOffense = readData(year, 'Rushing Offense');
-        let rushingDefense = readData(year, 'Rushing Defense');
-        let scoringOffense = readData(year, 'Scoring Offense');
-        let scoringDefense = readData(year, 'Scoring Defense');
-        let totalOffense = readData(year, 'Total Offense');
-        let totalDefense = readData(year, 'Total Defense');
-        let passingOffense = readData(year, 'Passing Offense');
-        let passingDefense = readData(year, 'Passing Yards Allowed');
-        let talent = require(`../talent/${year}`);
+    const getStatsForYear = (year) => {
+        const rushingOffense = readData(year, 'Rushing Offense');
+        const rushingDefense = readData(year, 'Rushing Defense');
+        const scoringOffense = readData(year, 'Scoring Offense');
+        const scoringDefense = readData(year, 'Scoring Defense');
+        const totalOffense = readData(year, 'Total Offense');
+        const totalDefense = readData(year, 'Total Defense');
+        const passingOffense = readData(year, 'Passing Offense');
+        const passingDefense = readData(year, 'Passing Yards Allowed');
+        const thirdDownOffense = readData(year, '3rd Down Conversion Pct');
+        const thirdDownDefense = readData(year, '3rd Down Conversion Pct Defense');
+        const toOffense = readData(year, 'Turnovers Lost');
+        const toDefense = readData(year, 'Turnovers Gained');
+        const redzoneO = readData(year, 'Red Zone Offense');
+        const redzoneD = readData(year, 'Red Zone Defense');
+        const talent = require(`../talent/${year}`);
 
         let teamStats = [];
 
@@ -34,18 +40,39 @@ module.exports = (fs, csvjson) => {
                 continue;
             }
 
-            let dRushing = rushingDefense.find(t => t.Team == mapMatch.location || t.Team == mapMatch.ncaaName || t.Team == mapMatch.abbreviation || t.Team == mapMatch.altName);
-            let oScoring = scoringOffense.find(t => t.Team == mapMatch.location || t.Team == mapMatch.ncaaName || t.Team == mapMatch.abbreviation || t.Team == mapMatch.altName);
-            let dScoring = scoringDefense.find(t => t.Team == mapMatch.location || t.Team == mapMatch.ncaaName || t.Team == mapMatch.abbreviation || t.Team == mapMatch.altName);
-            let oTotal = totalOffense.find(t => t.Team == mapMatch.location || t.Team == mapMatch.ncaaName || t.Team == mapMatch.abbreviation || t.Team == mapMatch.altName);
-            let dTotal = totalDefense.find(t => t.Team == mapMatch.location || t.Team == mapMatch.ncaaName || t.Team == mapMatch.abbreviation || t.Team == mapMatch.altName);
-            let oPassing = passingOffense.find(t => t.Team == mapMatch.location || t.Team == mapMatch.ncaaName || t.Team == mapMatch.abbreviation || t.Team == mapMatch.altName);
-            let dPassing = passingDefense.find(t => t.Team == mapMatch.location || t.Team == mapMatch.ncaaName || t.Team == mapMatch.abbreviation || t.Team == mapMatch.altName);
+            let findTeam = t => t.Team == mapMatch.location || t.Team == mapMatch.ncaaName || t.Team == mapMatch.abbreviation || t.Team == mapMatch.altName;
+
+            let dRushing = rushingDefense.find(findTeam);
+            let oScoring = scoringOffense.find(findTeam);
+            let dScoring = scoringDefense.find(findTeam);
+            let oTotal = totalOffense.find(findTeam);
+            let dTotal = totalDefense.find(findTeam);
+            let oPassing = passingOffense.find(findTeam);
+            let dPassing = passingDefense.find(findTeam);
+            let oThirdDown = thirdDownOffense.find(findTeam);
+            let dThirdDown = thirdDownDefense.find(findTeam);
+            let giveaways = toOffense.find(findTeam);
+            let takeaways = toDefense.find(findTeam);
+            let oRedZone = redzoneO.find(findTeam);
+            let dRedZone = redzoneD.find(findTeam);
             let teamTalent = talent.find(t => {
                 return t.name == mapMatch.location || t.name == mapMatch.ncaaName || t.name == mapMatch.abbreviation || t.name == mapMatch.altName;
             });
 
-            if (!dRushing || !oScoring || !dScoring || !oTotal || !dTotal || !oPassing || !dPassing || !teamTalent) {
+            if (!dRushing ||
+                !oScoring ||
+                !dScoring ||
+                !oTotal ||
+                !dTotal ||
+                !oPassing ||
+                !dPassing ||
+                !oThirdDown ||
+                !dThirdDown ||
+                !giveaways ||
+                !takeaways ||
+                !redzoneO ||
+                !redzoneD ||
+                !teamTalent) {
                 continue;
             }
 
@@ -60,7 +87,13 @@ module.exports = (fs, csvjson) => {
                 oYPP: oTotal['Yds/Play'] / 10,
                 dYPP: dTotal['Yds/Play'] / 10,
                 oYdsAtt: oPassing['Yds/Att'] / 20,
-                dYdsAtt: dPassing['Yds/Att'] / 20
+                dYdsAtt: dPassing['Yds/Att'] / 20,
+                oThirdD: oThirdDown.Pct * 1.0,
+                dThirdDown: dThirdDown.Pct * 1.0,
+                giveaways: (giveaways['Turn Lost'] / giveaways.G) / 5,
+                takeaways: (takeaways['Turn Gain'] / takeaways.G) / 5,
+                oRZ: oRedZone.Pct * 1.0,
+                dRZ: dRedZone.Pct * 1.0
             });
         }
 
@@ -99,7 +132,7 @@ module.exports = (fs, csvjson) => {
                 talent += otherTeamStats.talent;
             }
 
-            let orderedEvents = teamEvents.sort((a,b) => {
+            let orderedEvents = teamEvents.sort((a, b) => {
                 return new Date(a.date) < new Date(b.date) ? 1 : 0;
             });
 
@@ -120,8 +153,8 @@ module.exports = (fs, csvjson) => {
             let conferenceRecord = teamRecords.find(r => {
                 return r.type == "vsconf";
             });
-            
-            if (conferenceRecord && conferenceRecord.summary){
+
+            if (conferenceRecord && conferenceRecord.summary) {
                 stat.conferenceRecord.wins = conferenceRecord.summary.split("-")[0] * 1.0;
                 stat.conferenceRecord.losses = conferenceRecord.summary.split("-")[1] * 1.0;
                 stat.conferenceRecord.winsProb = conferenceRecord.summary.split("-")[0] * 1.0;

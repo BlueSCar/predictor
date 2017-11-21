@@ -27,7 +27,6 @@ module.exports = (cfb, statsService, fs) => {
 
         let input = [
             game.neutralSite ? 1 : 0,
-            game.conferenceCompetition ? 1 : 0,
             homeStats.talent,
             homeStats.SOS,
             homeStats.dRushP,
@@ -37,7 +36,13 @@ module.exports = (cfb, statsService, fs) => {
             homeStats.oRushP,
             homeStats.oPPP,
             homeStats.oYPP,
-            homeStats.oYdsAtt,
+            homeStats.oYdsAtt,              
+            homeStats.oThirdD,
+            homeStats.dThirdDown,
+            homeStats.giveaways,
+            homeStats.takeaways,
+            homeStats.oRZ,
+            homeStats.dRZ,
             awayStats.talent,
             awayStats.SOS,
             awayStats.dRushP,
@@ -47,7 +52,13 @@ module.exports = (cfb, statsService, fs) => {
             awayStats.oRushP,
             awayStats.oPPP,
             awayStats.oYPP,
-            awayStats.oYdsAtt
+            awayStats.oYdsAtt,                
+            awayStats.oThirdD,
+            awayStats.dThirdDown,
+            awayStats.giveaways,
+            awayStats.takeaways,
+            awayStats.oRZ,
+            awayStats.dRZ
         ];
 
         let output = [

@@ -38,7 +38,7 @@ module.exports = (fs) => {
     }
 
     let trainNetwork = () => {
-        let myNetwork = new Architect.Perceptron(22, 5, 2);
+        let myNetwork = new Architect.Perceptron(34, 9, 2);
         let trainer = new Trainer(myNetwork);
         let trainingSet = require('../dataset');
         let testSet = require('../testData');
@@ -48,9 +48,9 @@ module.exports = (fs) => {
         let error = 1;
 
         for (var i = 1; i < 50000; i++) {
-            trainer.train(trainingSet, {
+            trainer.train(shuffle(trainingSet), {
                 rate: .1,
-                iterations: 10,
+                iterations: 1,
                 error: 0.005,
                 shuffle: true
             });
@@ -59,7 +59,7 @@ module.exports = (fs) => {
 
             if (testResult.error < error) {
                 error = testResult.error;
-                console.log(`New record at iteration ${i*10}: ${error}`);
+                console.log(`New record at iteration ${i}: ${error}`);
 
                 fs.writeFileSync('./myNetworkOptimized.json', JSON.stringify(myNetwork.toJSON(), null, '\t'));
             }
@@ -86,7 +86,7 @@ module.exports = (fs) => {
     }
 
     let trainProbNetwork = () => {
-        let myNetwork = new Architect.Perceptron(22, 5, 1);
+        let myNetwork = new Architect.Perceptron(34, 9, 1);
         let trainer = new Trainer(myNetwork);
         let trainingSet = require('../dataset').map((value) => {
             return {
@@ -106,9 +106,9 @@ module.exports = (fs) => {
         let error = 1;
 
         for (var i = 1; i < 50000; i++) {
-            trainer.train(trainingSet, {
+            trainer.train(shuffle(trainingSet), {
                 rate: .1,
-                iterations: 10,
+                iterations: 1,
                 error: 0.005,
                 shuffle: true
             });
@@ -117,7 +117,7 @@ module.exports = (fs) => {
 
             if (testResult.error < error) {
                 error = testResult.error;
-                console.log(`New record at iteration ${i*10}: ${error}`);
+                console.log(`New record at iteration ${i}: ${error}`);
 
                 fs.writeFileSync('./myProbNetworkOptimized.json', JSON.stringify(myNetwork.toJSON(), null, '\t'));
             }

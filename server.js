@@ -5,7 +5,7 @@ let fs = require('fs');
 let networkService = require('./libs/network.service')(fs);
 let statsService = require('./libs/stats.service')(fs, csvjson);
 let dataService = require('./libs/data.service')(cfb, statsService, fs);
-// let predictorService = require('./libs/predictor.service')(fs, statsService, networkService, cfb);
+let predictorService = require('./libs/predictor.service')(fs, statsService, networkService, cfb);
 
 // predictorService.initialize()
 //     .then(() => {
@@ -27,19 +27,27 @@ let dataService = require('./libs/data.service')(cfb, statsService, fs);
 
 //         // predictorService.simulatePlayoff();
 
-//         // let network = networkService.retrieveNetwork();
+//         let network = networkService.retrieveNetwork();
 
-//         // let result = predictorService.projectGame(network, {
-//         //     id: 277
-//         // }, {
-//         //     id: 2628
-//         // }, 0, 1);
-//         // result;
+//         let homeStats = predictorService.stats.find(t => {
+//             return t.id == 130;
+//         });
 
-//         // predictorService.updatePredictions();
+//         homeStats.oYdsAtt = (8.1 / 20);
+//         homeStats.oRushP = 0.52;
+//         homeStats.oPPP = 0.45;
+//         homeStats.oYPP = 0.6;
+//         homeStats.oThirdD = 0.4;
+
+//         let result = predictorService.projectGame(network, {
+//             id: 275
+//         }, {
+//             id: 130
+//         }, 0, 1);
+//         result;
 
 //         // predictorService.getProbabilities();
 //     });
 
 
-networkService.trainNetwork();
+predictorService.updatePredictions();
