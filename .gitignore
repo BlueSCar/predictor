@@ -3,3 +3,4 @@ networks/
 datasets/
 .vscode/
 .eslintrc.json
+.env

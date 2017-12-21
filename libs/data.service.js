@@ -1,25 +1,15 @@
-module.exports = (cfb, statsService, fs) => {
-    let processEvent = (event, stats, dataset) => {
+module.exports = async(cfb, statsService, fs) => {
+    const processEvent = (event, stats) => {
         let game = event.competitions[0];
 
         if (!game.status.type.completed) {
             return;
         }
 
-        let homeTeam = game.competitors.find(t => {
-            return t.homeAway == 'home';
-        });
-        let awayTeam = game.competitors.find(t => {
-            return t.homeAway == 'away';
-        });
-
-        let homeStats = stats.find(t => {
-            return t.id == homeTeam.id;
-        });
-
-        let awayStats = stats.find(t => {
-            return t.id == awayTeam.id;
-        });
+        let homeTeam = game.competitors.find(t => t.homeAway == 'home');
+        let awayTeam = game.competitors.find(t => t.homeAway == 'away');
+        let homeStats = stats.find(t => t.id == homeTeam.id);
+        let awayStats = stats.find(t => t.id == awayTeam.id);
 
         if (!homeStats || !awayStats) {
             return;
@@ -27,6 +17,7 @@ module.exports = (cfb, statsService, fs) => {
 
         let input = [
             game.neutralSite ? 1 : 0,
+            game.conferenceCompetition ? 1 : 0,
             homeStats.talent,
             homeStats.SOS,
             homeStats.dRushP,
@@ -36,13 +27,19 @@ module.exports = (cfb, statsService, fs) => {
             homeStats.oRushP,
             homeStats.oPPP,
             homeStats.oYPP,
-            homeStats.oYdsAtt,              
+            homeStats.oYdsAtt,
             homeStats.oThirdD,
             homeStats.dThirdDown,
             homeStats.giveaways,
             homeStats.takeaways,
             homeStats.oRZ,
             homeStats.dRZ,
+            homeStats.oDriveYardsAvg,
+            homeStats.dDriveYardsAvg,
+            homeStats.oDrivePlaysAvg,
+            homeStats.dDrivePlaysAvg,
+            homeStats.oDriveTimeAvg,
+            homeStats.dDriveTimeAvg,
             awayStats.talent,
             awayStats.SOS,
             awayStats.dRushP,
@@ -52,13 +49,19 @@ module.exports = (cfb, statsService, fs) => {
             awayStats.oRushP,
             awayStats.oPPP,
             awayStats.oYPP,
-            awayStats.oYdsAtt,                
+            awayStats.oYdsAtt,
             awayStats.oThirdD,
             awayStats.dThirdDown,
             awayStats.giveaways,
             awayStats.takeaways,
             awayStats.oRZ,
-            awayStats.dRZ
+            awayStats.dRZ,
+            awayStats.oDriveYardsAvg,
+            awayStats.dDriveYardsAvg,
+            awayStats.oDrivePlaysAvg,
+            awayStats.dDrivePlaysAvg,
+            awayStats.oDriveTimeAvg,
+            awayStats.dDriveTimeAvg
         ];
 
         let output = [
@@ -66,70 +69,57 @@ module.exports = (cfb, statsService, fs) => {
             awayTeam.score / 100.0
         ];
 
-        dataset.push({
+        return {
             input: input,
             output: output
-        });
+        };
     }
 
-    let processYear = (year, dataset) => {
+    let processYear = async(year) => {
         let stats = statsService.getStatsForYear(year);
-        let events = [];
 
-        return cfb.scoreboard.getScoreboard({
+        const scoreboard = await cfb.scoreboard.getScoreboard({
             year: year
-        }).then((data) => {
-            if (!data || !data.events) {
-                return;
+        });
+        if (!scoreboard || !scoreboard.events) {
+            return;
+        }
+
+        const bowlScoreboard = await cfb.scoreboard.getScoreboard({
+            year: year,
+            seasontype: 3,
+            week: 1
+        });
+
+        let events = [
+            ...scoreboard.events.filter(e => e.season.year == year)
+        ];
+
+        for (let event of bowlScoreboard.events) {
+            if (!events.find(e => e.id == event.id)) {
+                events.push(event);
             }
+        }
 
-            events = events.concat(data.events);
-        }).then(() => {
-            return cfb.scoreboard.getScoreboard({
-                year: year,
-                seasontype: 3,
-                week: 1
-            })
-        }).then((data) => {
-            events = events.concat(data.events);
-        }).then(() => {
-            statsService.processSOS(stats, events);
+        statsService.processSOS(stats, events);
 
-            for (let event of events) {
-                processEvent(event, stats, dataset);
-            }
-
-            return Promise.resolve(dataset);
-        })
+        return events.map(event => {
+            return processEvent(event, stats);
+        }).filter(e => e);
     }
 
-    let generateTraningData = () => {
-        processYear(2015, [])
-            .then((dataset) => {
-                return processYear(2016, dataset);
-            })
-            // .then((dataset) => {
-            //     return processYear(2017, dataset);
-            // })
-            .then((dataset) => {
-                fs.appendFile('./dataset.json', JSON.stringify(dataset, null, '\t'), (err) => {
-                    err;
-                });
-                dataset;
-            }).then(() => {
-                return processYear(2017, [])
-                    .then((dataset) => {
-                        fs.appendFile('./testData.json', JSON.stringify(dataset, null, '\t'), (err) => {
-                            err;
-                        });
-                        dataset;
-                    });
-            });
+    let generateTraningData = async() => {
+        const dataset = [
+            ...(await processYear(2015)),
+            ...(await processYear(2016))
+        ];
+        await fs.appendFile('./dataset.json', JSON.stringify(dataset, null, '\t'));
+
+        const testData = await processYear(2017);
+        await fs.appendFile('./testData.json', JSON.stringify(testData, null, '\t'));
     }
 
     return {
-        processYear: processYear,
-        processEvent: processEvent,
         generateTraningData: generateTraningData
     }
 }

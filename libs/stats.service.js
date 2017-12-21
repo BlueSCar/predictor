@@ -1,5 +1,5 @@
 module.exports = (fs, csvjson) => {
-    const statsPath = 'C:\\Users\\bradjewski\\Desktop\\data\\stats';
+    const statsPath = process.env.STATS_PATH;
     const mappings = require('../teamMappings');
 
     const readData = (year, type) => {
@@ -26,14 +26,14 @@ module.exports = (fs, csvjson) => {
         const toDefense = readData(year, 'Turnovers Gained');
         const redzoneO = readData(year, 'Red Zone Offense');
         const redzoneD = readData(year, 'Red Zone Defense');
+        const driveOffense = readData(year, 'drive_offense');
+        const driveDefense = readData(year, 'drive_defense');
         const talent = require(`../talent/${year}`);
 
         let teamStats = [];
 
         for (let oRushing of rushingOffense) {
-            let mapMatch = mappings.find(t => {
-                return oRushing.Team == t.location || oRushing.Team == t.ncaaName || oRushing.Team == t.abbreviation || oRushing.Team == t.altName;
-            });
+            let mapMatch = mappings.find(t => oRushing.Team == t.location || oRushing.Team == t.ncaaName || oRushing.Team == t.abbreviation || oRushing.Team == t.altName);
 
             if (!mapMatch) {
                 console.log(oRushing.Team);
@@ -55,6 +55,8 @@ module.exports = (fs, csvjson) => {
             let takeaways = toDefense.find(findTeam);
             let oRedZone = redzoneO.find(findTeam);
             let dRedZone = redzoneD.find(findTeam);
+            let oDrive = driveOffense.find(t => t.id == mapMatch.id);
+            let dDrive = driveDefense.find(t => t.id == mapMatch.id);
             let teamTalent = talent.find(t => {
                 return t.name == mapMatch.location || t.name == mapMatch.ncaaName || t.name == mapMatch.abbreviation || t.name == mapMatch.altName;
             });
@@ -72,6 +74,8 @@ module.exports = (fs, csvjson) => {
                 !takeaways ||
                 !redzoneO ||
                 !redzoneD ||
+                !oDrive ||
+                ! dDrive ||
                 !teamTalent) {
                 continue;
             }
@@ -93,7 +97,13 @@ module.exports = (fs, csvjson) => {
                 giveaways: (giveaways['Turn Lost'] / giveaways.G) / 5,
                 takeaways: (takeaways['Turn Gain'] / takeaways.G) / 5,
                 oRZ: oRedZone.Pct * 1.0,
-                dRZ: dRedZone.Pct * 1.0
+                dRZ: dRedZone.Pct * 1.0,
+                oDriveYardsAvg: oDrive.avgYards / 100,
+                dDriveYardsAvg: dDrive.avgYards / 100,
+                oDrivePlaysAvg: oDrive.avgPlays / 10,
+                dDrivePlaysAvg: dDrive.avgPlays / 10,
+                oDriveTimeAvg: oDrive.avgSeconds / 240,
+                dDriveTimeAvg: dDrive.avgSeconds / 240
             });
         }
 
@@ -142,23 +152,23 @@ module.exports = (fs, csvjson) => {
             }).records;
 
             let totalRecord = teamRecords.find(r => {
-                return r.type == "total";
+                return r.type == 'total';
             });
 
-            stat.record.wins = totalRecord.summary.split("-")[0] * 1.0;
-            stat.record.losses = totalRecord.summary.split("-")[1] * 1.0;
-            stat.record.winsProb = totalRecord.summary.split("-")[0] * 1.0;
-            stat.record.lossesProb = totalRecord.summary.split("-")[1] * 1.0;
+            stat.record.wins = totalRecord.summary.split('-')[0] * 1.0;
+            stat.record.losses = totalRecord.summary.split('-')[1] * 1.0;
+            stat.record.winsProb = totalRecord.summary.split('-')[0] * 1.0;
+            stat.record.lossesProb = totalRecord.summary.split('-')[1] * 1.0;
 
             let conferenceRecord = teamRecords.find(r => {
-                return r.type == "vsconf";
+                return r.type == 'vsconf';
             });
 
             if (conferenceRecord && conferenceRecord.summary) {
-                stat.conferenceRecord.wins = conferenceRecord.summary.split("-")[0] * 1.0;
-                stat.conferenceRecord.losses = conferenceRecord.summary.split("-")[1] * 1.0;
-                stat.conferenceRecord.winsProb = conferenceRecord.summary.split("-")[0] * 1.0;
-                stat.conferenceRecord.lossesProb = conferenceRecord.summary.split("-")[1] * 1.0;
+                stat.conferenceRecord.wins = conferenceRecord.summary.split('-')[0] * 1.0;
+                stat.conferenceRecord.losses = conferenceRecord.summary.split('-')[1] * 1.0;
+                stat.conferenceRecord.winsProb = conferenceRecord.summary.split('-')[0] * 1.0;
+                stat.conferenceRecord.lossesProb = conferenceRecord.summary.split('-')[1] * 1.0;
             }
 
             stat.SOS = talent / teamEvents.length;

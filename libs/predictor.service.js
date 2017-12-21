@@ -1,49 +1,38 @@
-module.exports = (fs, statsService, networkService, cfb) => {
-    let csvPath = 'C:\\Users\\bradjewski\\Desktop\\data\\predictions\\Week 11.csv';
-    let recordsPath = 'C:\\Users\\bradjewski\\Desktop\\data\\predictions\\Week 11 Records.csv';
-    let probabilitesPath = 'C:\\Users\\bradjewski\\Desktop\\data\\predictions\\Week 7 Probabilities.csv';
-    let recordsProbPath = 'C:\\Users\\bradjewski\\Desktop\\data\\predictions\\Week 7 Record Probabilities.csv';
+module.exports = async(fs, statsService, networkService, cfb) => {
+    const csvPath = process.env.CSV_PATH;
+    const recordsPath = process.env.RECORDS_PATH;
+    const rankingsPath = process.env.RANKINGS_PATH;
+    const playoffPath = process.env.PLAYOFFS_PATH;
 
-    let myNetwork = networkService.retrieveNetwork();
-    let probNetwork = networkService.retrieveProbNetwork();
+    const myNetwork = networkService.retrieveNetwork();
+    const probNetwork = networkService.retrieveProbNetwork();
 
-    let stats = statsService.getStatsForYear(2017);
+    const stats = statsService.getStatsForYear(2017);
+    const scoreboard = await cfb.scoreboard.getScoreboard({
+        year: 2017
+    });
 
-    let lastYearStats = statsService.getStatsForYear(2016);
+    const bowlScoreboard = await cfb.scoreboard.getScoreboard({
+        year: 2017,            
+        seasontype: 3,
+        week: 1
+    }); 
 
-    let initialize = () => {
-        return cfb.scoreboard.getScoreboard({
-            year: 2017
-        }).then((data) => {
-            statsService.processSOS(stats, data.events);
-        }).then(() => {
-            return cfb.scoreboard.getScoreboard({
-                year: 2016
-            }).then((data) => {
-                statsService.processSOS(lastYearStats, data.events);
-            });
-        });
+    const events = [
+        ...scoreboard.events.filter(e => e.season.year == 2017)
+    ];
+
+    for (let event of bowlScoreboard.events){
+        if (!events.find(e => e.id == event.id)){
+            events.push(event);
+        }
     }
 
-    let currentWeight = 1;
-    let oldWeight = 0;
+    await statsService.processSOS(stats, events);
 
-    let projectGame = (network, homeTeam, awayTeam, neutralSite = 1, conferenceCompetition = 0) => {
-        let homeStats = stats.find(t => {
-            return t.id == homeTeam.id;
-        });
-
-        let awayStats = stats.find(t => {
-            return t.id == awayTeam.id;
-        });
-
-        // let homeStatsOld = lastYearStats.find(t => {
-        //     return t.id == homeTeam.id;
-        // });
-
-        // let awayStatsOld = lastYearStats.find(t => {
-        //     return t.id == awayTeam.id;
-        // });
+    const projectGame = (network, homeTeam, awayTeam, neutralSite = 1, conferenceCompetition = 0) => {
+        let homeStats = stats.find(t => t.id == homeTeam.id);
+        let awayStats = stats.find(t => t.id == awayTeam.id);
 
         if (!homeStats || !awayStats) {
             return;
@@ -61,13 +50,19 @@ module.exports = (fs, statsService, networkService, cfb) => {
             homeStats.oRushP,
             homeStats.oPPP,
             homeStats.oYPP,
-            homeStats.oYdsAtt,                
+            homeStats.oYdsAtt,
             homeStats.oThirdD,
             homeStats.dThirdDown,
             homeStats.giveaways,
             homeStats.takeaways,
             homeStats.oRZ,
             homeStats.dRZ,
+            homeStats.oDriveYardsAvg,
+            homeStats.dDriveYardsAvg,
+            homeStats.oDrivePlaysAvg,
+            homeStats.dDrivePlaysAvg,
+            homeStats.oDriveTimeAvg,
+            homeStats.dDriveTimeAvg,
             awayStats.talent,
             awayStats.SOS,
             awayStats.dRushP,
@@ -77,13 +72,19 @@ module.exports = (fs, statsService, networkService, cfb) => {
             awayStats.oRushP,
             awayStats.oPPP,
             awayStats.oYPP,
-            awayStats.oYdsAtt,                
+            awayStats.oYdsAtt,
             awayStats.oThirdD,
             awayStats.dThirdDown,
             awayStats.giveaways,
             awayStats.takeaways,
             awayStats.oRZ,
-            awayStats.dRZ
+            awayStats.dRZ,
+            awayStats.oDriveYardsAvg,
+            awayStats.dDriveYardsAvg,
+            awayStats.oDrivePlaysAvg,
+            awayStats.dDrivePlaysAvg,
+            awayStats.oDriveTimeAvg,
+            awayStats.dDriveTimeAvg
         ];
 
         let result = network.activate(input);
@@ -145,7 +146,7 @@ module.exports = (fs, statsService, networkService, cfb) => {
         sorted.pop();
 
         for (let stat of stats) {
-            stat.playoffHistory = "";
+            stat.playoffHistory = '';
         }
 
         let results = [];
@@ -153,11 +154,11 @@ module.exports = (fs, statsService, networkService, cfb) => {
         simulateRound(sorted, results, 1);
 
         for (let stat of stats) {
-            fs.appendFile("C:\\Users\\bradjewski\\Desktop\\data\\ranks\\rankings.csv", `\r\n${stat.playoffHistory},${stat.location}`);
+            fs.appendFile(rankingsPath, `\r\n${stat.playoffHistory},${stat.location}`);
         }
 
         for (let result of results) {
-            fs.appendFile("C:\\Users\\bradjewski\\Desktop\\data\\ranks\\results.csv", `\r\n${result.round},${result.homeId},${result.homeLocation},${result.homeScore},${result.awayId},${result.awayLocation},${result.awayScore}`);
+            fs.appendFile(playoffPath, `\r\n${result.round},${result.homeId},${result.homeLocation},${result.homeScore},${result.awayId},${result.awayLocation},${result.awayScore}`);
         }
     }
 
@@ -177,12 +178,8 @@ module.exports = (fs, statsService, networkService, cfb) => {
             let topTeam = topTier[i];
             let bottomTeam = teams[numGames - (i + 1)];
 
-            let topStat = stats.find(t => {
-                return t.id == topTeam.id;
-            });
-            let bottomStat = stats.find(t => {
-                return t.id == bottomTeam.id;
-            });
+            let topStat = stats.find(t => t.id == topTeam.id);
+            let bottomStat = stats.find(t => t.id == bottomTeam.id);
 
             let result = projectGame(myNetwork, {
                 id: topTeam.id
@@ -191,13 +188,13 @@ module.exports = (fs, statsService, networkService, cfb) => {
             }, 0, 1);
 
             if (result.projection[0] > result.projection[1]) {
-                topStat.playoffHistory += "1";
-                bottomStat.playoffHistory += "0";
+                topStat.playoffHistory += '1';
+                bottomStat.playoffHistory += '0';
                 winners.push(topTeam);
                 losers.push(bottomTeam);
             } else {
-                topStat.playoffHistory += "0";
-                bottomStat.playoffHistory += "1";
+                topStat.playoffHistory += '0';
+                bottomStat.playoffHistory += '1';
                 winners.push(bottomTeam);
                 losers.push(topTeam);
             }
@@ -221,31 +218,12 @@ module.exports = (fs, statsService, networkService, cfb) => {
 
     let getGamePrediction = (network, event) => {
         let game = event.competitions[0];
+        let homeTeam = game.competitors.find(t => t.homeAway == 'home');
+        let awayTeam = game.competitors.find(t => t.homeAway == 'away');
+        let homeStats = stats.find(t => t.id == homeTeam.id);
+        let awayStats = stats.find(t => t.id == awayTeam.id);
 
-        let homeTeam = game.competitors.find(t => {
-            return t.homeAway == 'home';
-        });
-        let awayTeam = game.competitors.find(t => {
-            return t.homeAway == 'away';
-        });
-
-        let homeStats = stats.find(t => {
-            return t.id == homeTeam.id;
-        });
-
-        let awayStats = stats.find(t => {
-            return t.id == awayTeam.id;
-        });
-
-        let homeStatsOld = lastYearStats.find(t => {
-            return t.id == homeTeam.id;
-        });
-
-        let awayStatsOld = lastYearStats.find(t => {
-            return t.id == awayTeam.id;
-        });
-
-        if (!homeStats || !awayStats || !homeStatsOld || !awayStatsOld) {
+        if (!homeStats || !awayStats) {
             return;
         }
 
@@ -261,13 +239,19 @@ module.exports = (fs, statsService, networkService, cfb) => {
             homeStats.oRushP,
             homeStats.oPPP,
             homeStats.oYPP,
-            homeStats.oYdsAtt,                
+            homeStats.oYdsAtt,
             homeStats.oThirdD,
             homeStats.dThirdDown,
             homeStats.giveaways,
             homeStats.takeaways,
             homeStats.oRZ,
             homeStats.dRZ,
+            homeStats.oDriveYardsAvg,
+            homeStats.dDriveYardsAvg,
+            homeStats.oDrivePlaysAvg,
+            homeStats.dDrivePlaysAvg,
+            homeStats.oDriveTimeAvg,
+            homeStats.dDriveTimeAvg,
             awayStats.talent,
             awayStats.SOS,
             awayStats.dRushP,
@@ -277,13 +261,19 @@ module.exports = (fs, statsService, networkService, cfb) => {
             awayStats.oRushP,
             awayStats.oPPP,
             awayStats.oYPP,
-            awayStats.oYdsAtt,                
+            awayStats.oYdsAtt,
             awayStats.oThirdD,
             awayStats.dThirdDown,
             awayStats.giveaways,
             awayStats.takeaways,
             awayStats.oRZ,
-            awayStats.dRZ
+            awayStats.dRZ,
+            awayStats.oDriveYardsAvg,
+            awayStats.dDriveYardsAvg,
+            awayStats.oDrivePlaysAvg,
+            awayStats.dDrivePlaysAvg,
+            awayStats.oDriveTimeAvg,
+            awayStats.dDriveTimeAvg
         ];
 
         let result = network.activate(input);
@@ -309,20 +299,10 @@ module.exports = (fs, statsService, networkService, cfb) => {
             let margin = result.projection[0] - result.projection[1];
             let game = event.competitions[0];
 
-            let homeTeam = game.competitors.find(t => {
-                return t.homeAway == 'home';
-            });
-            let awayTeam = game.competitors.find(t => {
-                return t.homeAway == 'away';
-            });
-
-            let homeStats = stats.find(t => {
-                return t.id == homeTeam.id;
-            });
-
-            let awayStats = stats.find(t => {
-                return t.id == awayTeam.id;
-            });
+            let homeTeam = game.competitors.find(t => t.homeAway == 'home');
+            let awayTeam = game.competitors.find(t => t.homeAway == 'away');
+            let homeStats = stats.find(t => t.id == homeTeam.id);
+            let awayStats = stats.find(t => t.id == awayTeam.id);
 
             if (margin > 0) {
                 homeStats.record.wins++;
@@ -358,87 +338,44 @@ module.exports = (fs, statsService, networkService, cfb) => {
         fs.appendFile(csvPath, `\r\n${result.id},${result.date},${result.homeTeam.team.location},${Math.round(result.projection[0] * 1000)/10},${result.homeTeam.score},${result.awayTeam.team.location},${Math.round(result.projection[1] * 1000)/10},${result.awayTeam.score},${probResult.projection[0]}`);
     }
 
-    let writeGamePredictionProb = (event) => {
-        let result = getGamePrediction(probNetwork, event);
+    let updatePredictions = async() => {
+        const scoreboard = await cfb.scoreboard.getScoreboard({
+            year: 2017
+        });
 
-        if (!result) {
-            return;
-        }
+        const bowlScoreboard = await cfb.scoreboard.getScoreboard({
+            year: 2017,            
+            seasontype: 3,
+            week: 1
+        }); 
 
-        if (!event.competitions[0].status.type.completed && event.competitions[0].status.type.id != 5 && event.competitions[0].status.type.id != 6) {
-            let game = event.competitions[0];
+        const events = [
+            ...scoreboard.events.filter(e => e.season.year == 2017)
+        ];
 
-            let homeTeam = game.competitors.find(t => {
-                return t.homeAway == 'home';
-            });
-            let awayTeam = game.competitors.find(t => {
-                return t.homeAway == 'away';
-            });
-
-            let homeStats = stats.find(t => {
-                return t.id == homeTeam.id;
-            });
-
-            let awayStats = stats.find(t => {
-                return t.id == awayTeam.id;
-            });
-
-            homeStats.record.winsProb += result.projection[0];
-            homeStats.record.lossesProb += (1 - result.projection[0]);
-            awayStats.record.winsProb += (1 - result.projection[0]);
-            awayStats.record.lossesProb += result.projection[0];
-
-            if (game.conferenceCompetition) {
-                homeStats.conferenceRecord.winsProb += result.projection[0];
-                homeStats.conferenceRecord.lossesProb += (1 - result.projection[0]);
-                awayStats.conferenceRecord.winsProb += (1 - result.projection[0]);
-                awayStats.conferenceRecord.lossesProb += result.projection[0];
+        for (let event of bowlScoreboard.events){
+            if (!events.find(e => e.id == event.id)){
+                events.push(event);
             }
         }
 
-        // fs.appendFile(probabilitesPath, `\r\n${result.id},${result.date},${result.homeTeam.team.location},${result.awayTeam.team.location},${result.projection[0]},${result.homeTeam.score > result.awayTeam.score ? 1 : 0},${result.projection[0] > .5 && (result.homeTeam.score > result.awayTeam.score) ? 1 : 0}`);
-    }
+        statsService.processSOS(stats, events);
 
-    let updatePredictions = () => {
-        cfb.scoreboard.getScoreboard({
-            year: 2017
-        }).then((data) => {
-            statsService.processSOS(stats, data.events);
+        for (let event of events) {
+            writeGamePrediction(event);
+        }
 
-            for (let event of data.events) {
-                writeGamePrediction(event);
-            }
-
-            for (let stat of stats) {
-                fs.appendFile(recordsPath, `\r\n${stat.id},${stat.location},${stat.record.wins},${stat.record.losses},${stat.conferenceRecord == null ? 0 : stat.conferenceRecord.wins},${stat.conferenceRecord == null ? 0 : stat.conferenceRecord.losses},${stat.record.winsProb},${stat.record.lossesProb},${stat.conferenceRecord == null ? 0 : stat.conferenceRecord.winsProb},${stat.conferenceRecord == null ? 0 : stat.conferenceRecord.lossesProb}`);
-            }
-        });
-    }
-
-    let getProbabilities = () => {
-        cfb.scoreboard.getScoreboard({
-            year: 2017
-        }).then((data) => {
-            statsService.processSOS(stats, data.events);
-
-            for (let event of data.events) {
-                writeGamePredictionProb(event);
-            }
-
-            for (let stat of stats) {
-                fs.appendFile(recordsProbPath, `\r\n${stat.id},${stat.location},${stat.record.winsProb},${stat.record.lossesProb},${stat.conferenceRecord == null ? 0 : stat.conferenceRecord.winsProb},${stat.conferenceRecord == null ? 0 : stat.conferenceRecord.lossesProb}`);
-            }
-        });
+        for (let stat of stats) {
+            fs.appendFile(recordsPath, `\r\n${stat.id},${stat.location},${stat.record.wins},${stat.record.losses},${stat.conferenceRecord == null ? 0 : stat.conferenceRecord.wins},${stat.conferenceRecord == null ? 0 : stat.conferenceRecord.losses},${stat.record.winsProb},${stat.record.lossesProb},${stat.conferenceRecord == null ? 0 : stat.conferenceRecord.winsProb},${stat.conferenceRecord == null ? 0 : stat.conferenceRecord.lossesProb}`);
+        }
     }
 
     return {
-        initialize: initialize,
         getGamePrediction: getGamePrediction,
         updatePredictions: updatePredictions,
         projectGame: projectGame,
         rankTeams: rankTeams,
         simulatePlayoff: simulatePlayoff,
-        getProbabilities: getProbabilities,
         stats: stats
     }
 }
